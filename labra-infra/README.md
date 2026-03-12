@@ -1,8 +1,5 @@
 # labra-infra
 
-This repo is the infra slice of Labra.  
-Right now we are intentionally parked at **Phase 4 / Ver 1.0** so we can
-stabilize the static path before adding more moving parts.
 
 ## What Is Active In `env/dev`
 
