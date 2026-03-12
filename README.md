@@ -1,6 +1,0 @@
-## TODO:
-
-## COMPLETED:
-
-## NOTES:
-
