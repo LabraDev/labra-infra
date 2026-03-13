@@ -10,7 +10,7 @@ terraform {
   }
 
   # We stay on local state until bootstrap finishes.
-  # Team note: after bootstrap, re-init with backend.hcl so we all share state.
+  # Note: after bootstrap, re-init with backend.hcl so we all share state.
 }
 
 locals {
@@ -21,7 +21,7 @@ locals {
       Environment = var.environment
       Owner       = var.owner
       ManagedBy   = "Terraform"
-      # Frontend/backend team: if an output looks off, check this tag in AWS first.
+      # Frontend/backend: if an output looks off, check this tag in AWS first.
       # It tells you exactly which roadmap milestone created the resource.
       Version      = var.roadmap_version
       RoadmapPhase = var.roadmap_phase
@@ -39,7 +39,7 @@ provider "aws" {
 }
 
 # Shared naming/tags for every module in this env.
-# Backend/frontend team: output keys are based on this prefix, so keep references
+# Backend/frontend: output keys are based on this prefix, so keep references
 # stable if you wire anything to resource names.
 module "labels" {
   source = "../../modules/labels"
@@ -67,7 +67,7 @@ module "state_bootstrap" {
 }
 
 # Network baseline: VPC, subnets, routing, optional NAT.
-# Backend team: worker/runtime design later still depends on this split.
+# Backend: worker/runtime design later still depends on this split.
 module "network" {
   source = "../../modules/network"
 
@@ -81,7 +81,7 @@ module "network" {
 }
 
 # Security baseline (Phase 0/1): SG layering + IAM role sketch.
-# Backend team: these role outputs remain the trust/policy baseline.
+# Backend: these role outputs remain the trust/policy baseline.
 module "security" {
   source = "../../modules/security"
 
@@ -92,8 +92,8 @@ module "security" {
 }
 
 # Phase 3/4 static deploy baseline: S3 + CloudFront + basic alarm scaffolding.
-# Backend team: deploy artifacts should land under `static_release_prefix`.
-# Frontend team: `static_site_url` is the URL for the deploy success state.
+# Backend: deploy artifacts should land under `static_release_prefix`.
+# Frontend: `static_site_url` is the URL for the deploy success state.
 module "static_runtime" {
   source = "../../modules/static_runtime"
 

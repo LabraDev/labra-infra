@@ -21,7 +21,7 @@ variable "aws_region" {
 
 # Primary owner tag for accountability and filtering.
 variable "owner" {
-  description = "Owner/team tag."
+  description = "Owner tag."
   type        = string
   default     = "cpsc465"
 }

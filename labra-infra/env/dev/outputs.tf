@@ -9,7 +9,7 @@ output "tags" {
   value       = module.labels.tags
 }
 
-# Backend/frontend team: use these values first when comparing state and logs.
+# Backend/frontend : use these values first when comparing state and logs.
 output "roadmap_phase" {
   description = "Roadmap phase marker for this environment."
   value       = var.roadmap_phase
@@ -85,8 +85,8 @@ output "deploy_role_arn" {
 }
 
 # Static deploy outputs (Phase 3/4 baseline).
-# Backend team: deploy flow writes artifacts + invalidates this distribution.
-# Frontend team: `static_site_url` is the URL to render after successful deploy.
+# Backend : deploy flow writes artifacts + invalidates this distribution.
+# Frontend : `static_site_url` is the URL to render after successful deploy.
 output "static_bucket_name" {
   description = "S3 bucket name for static deploy artifacts."
   value       = module.static_runtime.bucket_name

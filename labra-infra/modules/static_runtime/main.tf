@@ -5,7 +5,7 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
 }
 
 locals {
-  # Frontend team: this bucket/distribution pairing is the static deploy contract.
+  # Frontend : this bucket/distribution pairing is the static deploy contract.
   # If we rename it, update API docs + UI copy in the same PR.
   default_bucket_name = substr(
     lower(replace("${var.name_prefix}-${data.aws_caller_identity.current.account_id}-site", "_", "-")),
@@ -66,7 +66,7 @@ resource "aws_cloudfront_origin_access_control" "site" {
   signing_protocol                  = "sigv4"
 }
 
-# Frontend team: this CloudFront endpoint is what we show as "live URL".
+# Frontend : this CloudFront endpoint is what we show as "live URL".
 resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   default_root_object = var.default_root_object
@@ -146,7 +146,7 @@ resource "aws_s3_bucket_policy" "site" {
   policy = data.aws_iam_policy_document.site_bucket_policy.json
 }
 
-# Backend team: keep deploy snapshots under `release_prefix` so these
+# Backend : keep deploy snapshots under `release_prefix` so these
 # lifecycle rules actually do their job.
 resource "aws_s3_bucket_lifecycle_configuration" "site" {
   bucket = aws_s3_bucket.site.id

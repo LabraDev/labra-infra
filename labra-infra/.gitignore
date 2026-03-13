@@ -26,6 +26,3 @@ override.tf.json
 # Ignore local Terraform CLI configuration files.
 .terraformrc
 terraform.rc
-
-# Team doesnt need my peronal use docs
-/docs/

@@ -17,9 +17,9 @@ variable "component" {
   default     = ""
 }
 
-# Owner/team tag value.
+# Owner/ tag value.
 variable "owner" {
-  description = "Owner/team responsible for this stack."
+  description = "Owner/ responsible for this stack."
   type        = string
 }
 

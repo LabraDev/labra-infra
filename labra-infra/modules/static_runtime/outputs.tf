@@ -33,7 +33,7 @@ output "release_prefix" {
   value       = var.release_prefix
 }
 
-# Backend team: this key is the contract for your current-release pointer writes.
+# Backend : this key is the contract for your current-release pointer writes.
 output "current_release_pointer_key" {
   description = "S3 object key used as current release pointer."
   value       = var.current_release_pointer_key

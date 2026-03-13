@@ -25,7 +25,7 @@ variable "aws_region" {
 }
 
 variable "owner" {
-  description = "Owner/team tag value."
+  description = "Owner/ tag value."
   type        = string
   default     = "cpsc465-infra"
 }
@@ -112,7 +112,7 @@ variable "app_port" {
 }
 
 # Per-app contract fields from roadmap Ver 0.3.
-# Backend/frontend team: keep these in sync with app metadata records.
+# Backend/frontend : keep these in sync with app metadata records.
 variable "app_name" {
   description = "Logical app name tag used by runtime resources."
   type        = string

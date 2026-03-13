@@ -60,7 +60,7 @@ We can add those back one phase at a time once Phase 4 is clean.
 
 - `main.tf`: composes active modules for Phase 4.
 - `variables.tf`: all env inputs with Phase 4 defaults.
-- `terraform.tfvars`: current dev values teammates actually apply.
+- `terraform.tfvars`: current dev values to actually apply.
 - `outputs.tf`: contract outputs backend/frontend consume.
 - `backend.hcl.example`: template for remote backend init.
 

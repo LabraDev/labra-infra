@@ -1,5 +1,5 @@
 # ALB security group allows inbound HTTP from the internet.
-# Frontend team: the "live URL" eventually resolves through this ALB path.
+# Frontend : the "live URL" eventually resolves through this ALB path.
 resource "aws_security_group" "alb" {
   name        = "${var.name_prefix}-alb-sg"
   description = "Ingress for public ALB traffic"
@@ -28,7 +28,7 @@ resource "aws_security_group" "alb" {
 }
 
 # App security group only allows traffic from ALB on app_port.
-# Backend team: if app_port changes in deploy config, this SG must stay in sync.
+# Backend : if app_port changes in deploy config, this SG must stay in sync.
 resource "aws_security_group" "app" {
   name        = "${var.name_prefix}-app-sg"
   description = "Ingress from ALB to app runtime"
@@ -57,7 +57,7 @@ resource "aws_security_group" "app" {
 }
 
 # Build role trust policy (ECS task principal for now).
-# Backend/CI team: this is the role our build worker should assume.
+# Backend/CI : this is the role our build worker should assume.
 data "aws_iam_policy_document" "build_assume_role" {
   statement {
     effect = "Allow"
@@ -84,7 +84,7 @@ resource "aws_iam_role" "build_worker" {
 # - ECR auth/push operations for image publication
 # - CloudWatch Logs write for build logs
 # - S3 read/write for artifacts
-# Backend/CI team: once repo/bucket names are fixed, we should replace "*" here.
+# Backend/CI : once repo/bucket names are fixed, we should replace "*" here.
 data "aws_iam_policy_document" "build_permissions" {
   statement {
     sid    = "EcrPushPull"
@@ -138,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "build_worker" {
 }
 
 # Deploy role trust policy (ECS task principal for now).
-# Backend/CI team: deploy worker should assume this role for ECS rollouts.
+# Backend/CI : deploy worker should assume this role for ECS rollouts.
 data "aws_iam_policy_document" "deploy_assume_role" {
   statement {
     effect = "Allow"
@@ -164,7 +164,7 @@ resource "aws_iam_role" "deploy_worker" {
 # Deploy permissions (MVP baseline):
 # - ECS service/task definition update operations
 # - IAM PassRole for ECS task/execution roles during deployment
-# Backend/CI team: same as build role, we should scope resources once ARNs settle.
+# Backend/CI : same as build role, we should scope resources once ARNs settle.
 data "aws_iam_policy_document" "deploy_permissions" {
   statement {
     sid    = "EcsDeployActions"
