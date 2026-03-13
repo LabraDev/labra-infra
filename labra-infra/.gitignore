@@ -13,7 +13,7 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 
-#  still track the shared dev tfvars template for team onboarding
+#  still track the shared dev tfvars template for onboarding
 !env/dev/terraform.tfvars
 
 #  ignore local override files because they are machine specific
