@@ -1,8 +1,8 @@
 terraform {
-  # Pin Terraform to a modern version that supports current AWS provider features.
+  #  pinned this so we all run the same Terraform core version
   required_version = ">= 1.6.0"
 
-  # Lock provider sources/versions for reproducible plans across machines.
+  #  pinned provider source and range so local plans stay consistent across our machines
   required_providers {
     aws = {
       source  = "hashicorp/aws"

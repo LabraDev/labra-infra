@@ -1,44 +1,42 @@
-# Project name (example: labra-infra).
+#  keep project and env separate so naming stays readable and predictable for both of you
 variable "project_name" {
-  description = "Project identifier used in names and tags."
+  description = "Project identifier used in names and tags"
   type        = string
 }
 
-# Environment label (example: dev, staging, prod).
 variable "environment" {
-  description = "Environment identifier."
+  description = "Environment identifier"
   type        = string
 }
 
-# Optional component suffix to separate module/resource groups.
+#  use component as a suffix when we need to split resources by concern
 variable "component" {
-  description = "Optional component suffix for resource names."
+  description = "Optional component suffix for resource names"
   type        = string
   default     = ""
 }
 
-# Owner/ tag value.
+#  keep owner explicit so accountability is obvious in AWS tags
 variable "owner" {
-  description = "Owner/ responsible for this stack."
+  description = "Owner responsible for this stack"
   type        = string
 }
 
-# Additional tag values merged with module defaults.
 variable "extra_tags" {
-  description = "Optional additional tags."
+  description = "Optional additional tags"
   type        = map(string)
   default     = {}
 }
 
-# Roadmap tags keep AWS resources traceable to the doc milestone we implemented.
+#  keep roadmap markers in tags so when we debug in AWS we know exactly which milestone made a thing
 variable "roadmap_phase" {
-  description = "Roadmap phase label for tagging."
+  description = "Roadmap phase label for tagging"
   type        = string
   default     = "Phase 4"
 }
 
 variable "roadmap_version" {
-  description = "Roadmap version label for tagging."
+  description = "Roadmap version label for tagging"
   type        = string
   default     = "Ver 1.0"
 }

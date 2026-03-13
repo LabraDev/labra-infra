@@ -1,17 +1,16 @@
-# Copy this file to backend.hcl, then run:
-# terraform init -reconfigure -backend-config=backend.hcl
+#  copy this to backend.hcl and then run terraform init -reconfigure -backend-config=backend.hcl
 
-# S3 bucket created by modules/state-bootstrap.
+#  set this to the state bucket created by state-bootstrap
 bucket = "replace-me-labra-infra-dev-tfstate"
 
-# State object key for this environment.
+#  keep one stable state object path per env
 key = "env/dev/terraform.tfstate"
 
-# Region of the S3 backend bucket and DynamoDB table.
+#  keep region explicit so init does not guess wrong
 region = "us-west-2"
 
-# DynamoDB table created by modules/state-bootstrap.
+#  point this at the Dynamo lock table from state-bootstrap
 dynamodb_table = "labra-infra-dev-platform-terraform-locks"
 
-# Encrypt state objects in S3.
+#  keep encryption on for state objects
 encrypt = true

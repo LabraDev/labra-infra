@@ -1,5 +1,5 @@
 terraform {
-  # Keep Terraform version aligned with root-level constraints.
+  #  keep this aligned with root constraints so nobody gets odd version mismatch errors
   required_version = ">= 1.6.0"
 
   required_providers {
@@ -9,20 +9,17 @@ terraform {
     }
   }
 
-  # We stay on local state until bootstrap finishes.
-  # Note: after bootstrap, re-init with backend.hcl so we all share state.
+  #  keep local state first until one of us runs the backend bootstrap flow
 }
 
 locals {
-  # Default tags from variables so provider config is stable at init/plan time.
+  #  build provider tags from vars so frontend/backend can see clean ownership and phase metadata in AWS
   provider_default_tags = merge(
     {
-      Project     = var.project_name
-      Environment = var.environment
-      Owner       = var.owner
-      ManagedBy   = "Terraform"
-      # Frontend/backend: if an output looks off, check this tag in AWS first.
-      # It tells you exactly which roadmap milestone created the resource.
+      Project      = var.project_name
+      Environment  = var.environment
+      Owner        = var.owner
+      ManagedBy    = "Terraform"
       Version      = var.roadmap_version
       RoadmapPhase = var.roadmap_phase
     },
@@ -38,9 +35,7 @@ provider "aws" {
   }
 }
 
-# Shared naming/tags for every module in this env.
-# Backend/frontend: output keys are based on this prefix, so keep references
-# stable if you wire anything to resource names.
+#  keep labels central so both of you can trust naming/tag patterns in outputs and logs
 module "labels" {
   source = "../../modules/labels"
 
@@ -53,8 +48,7 @@ module "labels" {
   roadmap_version = var.roadmap_version
 }
 
-# One-time remote-state bootstrap (S3 + DynamoDB lock table).
-# Keep this false for normal applies once backend is configured.
+#  only use this when we need to create shared remote state infra for the first time
 module "state_bootstrap" {
   count  = var.bootstrap_state_backend ? 1 : 0
   source = "../../modules/state-bootstrap"
@@ -66,53 +60,23 @@ module "state_bootstrap" {
   tags              = module.labels.tags
 }
 
-# Network baseline: VPC, subnets, routing, optional NAT.
-# Backend: worker/runtime design later still depends on this split.
-module "network" {
-  source = "../../modules/network"
-
-  name_prefix          = module.labels.resource_prefix
-  vpc_cidr             = var.vpc_cidr
-  az_count             = var.az_count
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  enable_nat_gateway   = var.enable_nat_gateway
-  tags                 = module.labels.tags
-}
-
-# Security baseline (Phase 0/1): SG layering + IAM role sketch.
-# Backend: these role outputs remain the trust/policy baseline.
-module "security" {
-  source = "../../modules/security"
-
-  name_prefix = module.labels.resource_prefix
-  vpc_id      = module.network.vpc_id
-  app_port    = var.app_port
-  tags        = module.labels.tags
-}
-
-# Phase 3/4 static deploy baseline: S3 + CloudFront + basic alarm scaffolding.
-# Backend: deploy artifacts should land under `static_release_prefix`.
-# Frontend: `static_site_url` is the URL for the deploy success state.
+#  kept this focused on what we need through Phase 4 for static deploys
 module "static_runtime" {
   source = "../../modules/static_runtime"
 
-  name_prefix                 = module.labels.resource_prefix
-  app_name                    = var.app_name
-  bucket_name                 = var.static_site_bucket_name
-  default_root_object         = var.static_default_root_object
-  price_class                 = var.static_price_class
-  enable_spa_routing          = var.static_enable_spa_routing
-  force_destroy               = var.static_force_destroy
-  release_prefix              = var.static_release_prefix
-  current_release_pointer_key = var.static_current_release_pointer_key
-  release_retention_days      = var.static_release_retention_days
-  noncurrent_retention_days   = var.static_noncurrent_retention_days
-  enable_alarms               = var.static_enable_alarms
-  enable_4xx_alarm            = var.static_enable_4xx_alarm
-  alarm_period_seconds        = var.static_alarm_period_seconds
-  alarm_evaluation_periods    = var.static_alarm_evaluation_periods
-  cf_5xx_rate_threshold       = var.static_cf_5xx_rate_threshold
-  cf_4xx_rate_threshold       = var.static_cf_4xx_rate_threshold
-  tags                        = module.labels.tags
+  name_prefix               = module.labels.resource_prefix
+  app_name                  = var.app_name
+  bucket_name               = var.static_site_bucket_name
+  default_root_object       = var.static_default_root_object
+  price_class               = var.static_price_class
+  enable_spa_routing        = var.static_enable_spa_routing
+  force_destroy             = var.static_force_destroy
+  release_prefix            = var.static_release_prefix
+  release_retention_days    = var.static_release_retention_days
+  noncurrent_retention_days = var.static_noncurrent_retention_days
+  enable_alarms             = var.static_enable_alarms
+  alarm_period_seconds      = var.static_alarm_period_seconds
+  alarm_evaluation_periods  = var.static_alarm_evaluation_periods
+  cf_5xx_rate_threshold     = var.static_cf_5xx_rate_threshold
+  tags                      = module.labels.tags
 }

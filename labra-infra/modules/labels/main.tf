@@ -1,11 +1,11 @@
 locals {
-  # Add a dash only when component is provided so names stay clean.
+  #  add this suffix only when component is set so names do not get awkward double dashes
   component_suffix = var.component != "" ? "-${var.component}" : ""
 
-  # Canonical prefix shared by resources in this stack/component.
+  #  use one canonical prefix so backend and frontend can map outputs to resource names quickly
   resource_prefix = "${var.project_name}-${var.environment}${local.component_suffix}"
 
-  # Base tag set expected on all managed resources.
+  #  keep a shared base tag set so our AWS filtering is consistent everywhere
   base_tags = {
     Project      = var.project_name
     Environment  = var.environment
@@ -15,6 +15,6 @@ locals {
     RoadmapPhase = var.roadmap_phase
   }
 
-  # Final tags after merging optional custom values.
+  #  merge optional extras last so we can extend tags without touching core logic
   tags = merge(local.base_tags, var.extra_tags)
 }

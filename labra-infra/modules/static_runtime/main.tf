@@ -5,8 +5,7 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
 }
 
 locals {
-  # Frontend : this bucket/distribution pairing is the static deploy contract.
-  # If we rename it, update API docs + UI copy in the same PR.
+  #  derive a deterministic bucket name so backend and frontend can rely on stable naming without hardcoding
   default_bucket_name = substr(
     lower(replace("${var.name_prefix}-${data.aws_caller_identity.current.account_id}-site", "_", "-")),
     0,
@@ -20,7 +19,7 @@ locals {
   })
 }
 
-# This bucket stores built static files and release snapshots.
+#  store static build output and release snapshots in this bucket
 resource "aws_s3_bucket" "site" {
   bucket        = local.site_bucket_name
   force_destroy = var.force_destroy
@@ -48,7 +47,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "site" {
   }
 }
 
-# Keep bucket private. CloudFront (via OAC) is the only public entry point.
+#  keep this bucket private and only let CloudFront read through OAC
 resource "aws_s3_bucket_public_access_block" "site" {
   bucket = aws_s3_bucket.site.id
 
@@ -66,7 +65,7 @@ resource "aws_cloudfront_origin_access_control" "site" {
   signing_protocol                  = "sigv4"
 }
 
-# Frontend : this CloudFront endpoint is what we show as "live URL".
+#  expose this distribution as the live URL surface both of you show and consume in your flows
 resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   default_root_object = var.default_root_object
@@ -146,8 +145,7 @@ resource "aws_s3_bucket_policy" "site" {
   policy = data.aws_iam_policy_document.site_bucket_policy.json
 }
 
-# Backend : keep deploy snapshots under `release_prefix` so these
-# lifecycle rules actually do their job.
+#  keep lifecycle rules scoped to our release prefix so old release data cleans up without manual work
 resource "aws_s3_bucket_lifecycle_configuration" "site" {
   bucket = aws_s3_bucket.site.id
 
@@ -191,26 +189,6 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_rate" {
   evaluation_periods  = var.alarm_evaluation_periods
   threshold           = var.cf_5xx_rate_threshold
   metric_name         = "5xxErrorRate"
-  namespace           = "AWS/CloudFront"
-  period              = var.alarm_period_seconds
-  statistic           = "Average"
-  treat_missing_data  = "notBreaching"
-
-  dimensions = {
-    DistributionId = aws_cloudfront_distribution.site.id
-    Region         = "Global"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_rate" {
-  count = var.enable_alarms && var.enable_4xx_alarm ? 1 : 0
-
-  alarm_name          = "${var.name_prefix}-static-cf-4xx-rate"
-  alarm_description   = "CloudFront 4xx error rate above threshold"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = var.alarm_evaluation_periods
-  threshold           = var.cf_4xx_rate_threshold
-  metric_name         = "4xxErrorRate"
   namespace           = "AWS/CloudFront"
   period              = var.alarm_period_seconds
   statistic           = "Average"

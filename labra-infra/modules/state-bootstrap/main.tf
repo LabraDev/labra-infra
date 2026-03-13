@@ -1,9 +1,9 @@
 locals {
-  # Use caller override when provided; otherwise derive a predictable name.
+  #  let callers override the lock table name but keep a safe default for quick setup
   resolved_lock_table_name = coalesce(var.lock_table_name, "${var.name_prefix}-terraform-locks")
 }
 
-# Stores Terraform state centrally for collaboration and history.
+#  create shared state storage so we stop stepping on each other in local state files
 resource "aws_s3_bucket" "state" {
   bucket        = var.state_bucket_name
   force_destroy = var.force_destroy
@@ -13,7 +13,7 @@ resource "aws_s3_bucket" "state" {
   })
 }
 
-# Enables version history so state can be recovered after mistakes.
+#  keep versioning on so we can recover from bad applies or accidental state edits
 resource "aws_s3_bucket_versioning" "state" {
   bucket = aws_s3_bucket.state.id
 
@@ -22,7 +22,7 @@ resource "aws_s3_bucket_versioning" "state" {
   }
 }
 
-# Enforces server-side encryption for all stored state objects.
+#  enforce SSE on state objects because plain-text state in S3 is asking for trouble
 resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
   bucket = aws_s3_bucket.state.id
 
@@ -33,7 +33,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
   }
 }
 
-# Blocks all forms of public access to protect sensitive state content.
+#  hard block public access here because state includes sensitive material
 resource "aws_s3_bucket_public_access_block" "state" {
   bucket = aws_s3_bucket.state.id
 
@@ -43,13 +43,13 @@ resource "aws_s3_bucket_public_access_block" "state" {
   restrict_public_buckets = true
 }
 
-# Provides a distributed lock so concurrent Terraform applies are safe.
+#  create a lock table so concurrent applies do not corrupt shared state
 resource "aws_dynamodb_table" "locks" {
   name         = local.resolved_lock_table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
-  # Terraform's S3 backend expects this exact key name.
+  #  have to keep this exact key name because Terraform backend locking expects LockID
   attribute {
     name = "LockID"
     type = "S"
